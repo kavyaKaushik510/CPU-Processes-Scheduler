@@ -91,6 +91,7 @@ public class Patron extends Thread {
 			long firstOrderCompletedTime = drinksOrder[0].getOrderCompletedTime();
 			responseTime = firstOrderCompletedTime - firstOrderPlacedTime;
 
+			TimingLog.logPatronMetrics(this.ID, responseTime, waitingTime, turnaroundTime);
 			
 		} catch (InterruptedException e1) {  //do nothing
 		}

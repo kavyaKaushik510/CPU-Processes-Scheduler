@@ -29,6 +29,8 @@ public class SchedulingSimulation {
 		if(args.length>=4) q=Integer.parseInt(args[3]);  // time slice for RR
 		if(args.length>=5) seed=Integer.parseInt(args[4]); // random number seed- set to compare apples with apples		
 		
+		//Initialise summary log file	
+		TimingLog.init(noPatrons, sched, q, s, seed);
 
 		startSignal= new CountDownLatch(noPatrons+2);//Barman and patrons and main method must be ready
 		
