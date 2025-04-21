@@ -11,3 +11,16 @@ PatronID,ResponseTime,TotalWaitingTime,TurnaroundTime
 6,216,2711,3250
 3,1237,3018,3635
 5,441,3088,3641
+
+# Run: Patrons=10, Scheduler=RR, Quantum=30, Switch=5, Seed=42
+PatronID,ResponseTime,TotalWaitingTime,TurnaroundTime
+1,26,1650,2096
+0,27,1567,2375
+2,26,1842,2527
+6,213,2246,2940
+4,108,2457,3107
+7,229,2447,3054
+8,455,2525,3182
+9,784,2507,3213
+3,1410,3173,3601
+5,416,3108,3608

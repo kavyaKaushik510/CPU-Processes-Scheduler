@@ -74,7 +74,11 @@ public class Barman extends Thread {
 					if(burst<=q) { //within the quantum
 						sleep(burst); //processing complete order ="CPU burst"
 						System.out.println("---Barman has made drink for patron "+ currentOrder.toString());
-						currentOrder.orderDone();
+						currentOrder.orderDone();		
+						
+						//Log order preparation Time
+						long prepDuration = currentOrder.getOrderCompletedTime() - currentOrder.getOrderStartTime();
+						TimingLog.logDrinkPreparationTime(prepDuration);
 					}
 					else {
 						sleep(q);

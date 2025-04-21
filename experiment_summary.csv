@@ -1,0 +1,2 @@
+Scheduler,Quantum,Patrons,SwitchTime,Seed,AvgTAT,MedTAT,StdTAT,AvgWait,MedWait,StdWait,AvgResp,MedResp,StdResp,CPUUtilization,Throughput
+RR,30,10,5,42,2970.30,3080,474.35,2352.20,2452,519.61,369.40,221,415.91,24.31

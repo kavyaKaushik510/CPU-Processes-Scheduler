@@ -75,7 +75,7 @@ public class SchedulingSimulation {
 		//Simulation time end time
 		long simEndTime = System.currentTimeMillis();
 		long simDuration = simEndTime - simStartTime;
-		
+		TimingLog.recordSimulationDuration(simDuration);
 
       	System.out.println("------Bar closed------");
 
