@@ -20,7 +20,7 @@ public class TimingLog {
     private static int currentPatronCount;
     private static long totalDrinkPrepTime = 0;
     private static String currentRunInfo;
-
+    private static int totalNumberOfdrinks = 0;
 
     //Store all values for experiment summary
     private static List<Long> turnaroundList = new ArrayList<>();
@@ -51,6 +51,7 @@ public class TimingLog {
 
         String qDisplay = (schedAlg == 2) ? String.valueOf(q) : "N/A";
         currentRunInfo = String.format("%s,%s,%d,%d,%d", scheduler, qDisplay, patrons, switchTime, seed);
+        totalNumberOfdrinks = patrons * 5; // Fixed value of 5 drinks ordered by each patron
 
         metricsWriter.println();
         metricsWriter.printf("# Run: Patrons=%d, Scheduler=%s, Quantum=%s, Switch=%d, Seed=%d%n", patrons, scheduler, qDisplay, switchTime, seed);
@@ -91,14 +92,16 @@ public class TimingLog {
             }
 
             double cpuUtil = (simDuration > 0) ? (totalDrinkPrepTime * 100.0) / simDuration : 0;
+            double throughput = (simDuration > 0) ? (totalNumberOfdrinks * 1000.0) / simDuration : 0;
 
             summaryWriter.printf("%s,%s,%s,%s,%.2f%n",
             currentRunInfo,
             formatStats(turnaroundList),
             formatStats(waitingList),
             formatStats(responseList),
-            cpuUtil);
+            cpuUtil, throughput);
         }
+    
     }
 
     private static String formatStats(List<Long> list) {
