@@ -6,11 +6,20 @@ import java.io.PrintWriter;
 
 public class TimingLog {
 
-    private static PrintWriter writer;
-    private static String filename = "all_results.csv";
+    private static PrintWriter metricsWriter;
+    private static PrintWriter summaryWriter;
+    private static String metricsFile= "experiments.csv";
+    private static String summaryFile = "experiment_summary.csv";
+    
+
+    //Experiment Details
+    private static long simDuration = 0;
+    private static int currentPatronCount;
+
 
     public static void init(int patrons, int schedAlg, int q, int switchTime, long seed) throws IOException {
-        writer = new PrintWriter(new FileWriter(filename, true)); //append to file
+        metricsWriter = new PrintWriter(new FileWriter(metricsFile, true)); 
+        summaryWriter = new PrintWriter(new FileWriter(summaryFile, true));
 
         String scheduler;
         switch (schedAlg) {
@@ -28,22 +37,30 @@ public class TimingLog {
                 break;
         }
 
+
+
         String qDisplay = (schedAlg == 2) ? String.valueOf(q) : "N/A";
 
-        writer.println();
-        writer.printf("# Run: Patrons=%d, Scheduler=%s, Quantum=%s, Switch=%d, Seed=%d%n", patrons, scheduler, qDisplay, switchTime, seed);
-        writer.println("PatronID,ResponseTime,TotalWaitingTime,TurnaroundTime");
-        writer.flush();
+        metricsWriter.println();
+        metricsWriter.printf("# Run: Patrons=%d, Scheduler=%s, Quantum=%s, Switch=%d, Seed=%d%n", patrons, scheduler, qDisplay, switchTime, seed);
+        metricsWriter.println("PatronID,ResponseTime,TotalWaitingTime,TurnaroundTime");
+        metricsWriter.flush();
     }
 
     public static synchronized void logPatronMetrics(int patronId, long responseTime, long totalWaitingTime, long turnaroundTime) {
-        writer.printf("%d,%d,%d,%d%n", patronId, responseTime, totalWaitingTime, turnaroundTime);
-        writer.flush();
+        metricsWriter.printf("%d,%d,%d,%d%n", patronId, responseTime, totalWaitingTime, turnaroundTime);
+        metricsWriter.flush();
+
+
+    }
+
+    public static void recordSimulationDuration(long simulationDuration) {
+        simDuration = simulationDuration;
     }
 
     public static void close() {
-        if (writer != null) {
-            writer.close();
+        if (metricsWriter != null) {
+            metricsWriter.close();
         }
     }
 }

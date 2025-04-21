@@ -61,6 +61,7 @@ public class SchedulingSimulation {
 			  System.out.println("-------------- and RR scheduling with q="+q+"-------------");
 		}
 		
+		long simStartTime = System.currentTimeMillis();
 			
       	startSignal.countDown(); //main method ready
       	
@@ -70,6 +71,15 @@ public class SchedulingSimulation {
     	System.out.println("------Waiting for Barman------");
     	Sarah.interrupt();   //tell Barman to close up
     	Sarah.join(); //wait till she has
+
+		//Simulation time end time
+		long simEndTime = System.currentTimeMillis();
+		long simDuration = simEndTime - simStartTime;
+		
+
       	System.out.println("------Bar closed------");
+
+		//Close the results file
+		TimingLog.close();
  	}
 }

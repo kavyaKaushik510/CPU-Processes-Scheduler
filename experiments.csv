@@ -1,0 +1,13 @@
+
+# Run: Patrons=10, Scheduler=RR, Quantum=30, Switch=5, Seed=42
+PatronID,ResponseTime,TotalWaitingTime,TurnaroundTime
+2,25,1153,1878
+0,27,1655,2152
+8,460,2087,2758
+1,25,2495,3158
+4,110,2455,3153
+7,233,2285,3018
+9,855,2571,3053
+6,216,2711,3250
+3,1237,3018,3635
+5,441,3088,3641
