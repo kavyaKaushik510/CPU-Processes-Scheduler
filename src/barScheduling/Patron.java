@@ -21,6 +21,7 @@ public class Patron extends Thread {
 	private long lastDrinkFinishTime;
 	private long waitingTime = 0;
 	private long turnaroundTime = 0;
+	private long responseTime = 0;
 	private long orderPlacedTime = 0;
 	private long orderReceivedTime = 0;
 
@@ -86,8 +87,10 @@ public class Patron extends Thread {
 				waitingTime += drinksOrder[i].getOrderStartTime() - drinksOrder[i].getOrderPlacedTime();
 			}
 
+			//Response Time = Time between placing order for first drink and receiving it
+			long firstOrderCompletedTime = drinksOrder[0].getOrderCompletedTime();
+			responseTime = firstOrderCompletedTime - firstOrderPlacedTime;
 
-			
 			
 		} catch (InterruptedException e1) {  //do nothing
 		}

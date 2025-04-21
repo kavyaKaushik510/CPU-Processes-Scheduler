@@ -68,6 +68,7 @@ public class DrinkOrder  {
     //Timings to be recorded 
     private long orderPlacedTime = 0;
     private long orderStartTime = 0;
+    private long orderCompletedTime = 0;
 
  //constructor
     public DrinkOrder(int patron, long orderPlacedTime) {
@@ -110,6 +111,7 @@ public class DrinkOrder  {
 
     //Barman signals when order is done
     public synchronized void orderDone() {
+        orderCompletedTime = System.currentTimeMillis();
         orderComplete.set(true);
         this.notifyAll();
     }
@@ -132,6 +134,10 @@ public class DrinkOrder  {
 
     public long getOrderStartTime() {
         return orderStartTime;
+    }
+
+    public long getOrderCompletedTime() {
+        return orderCompletedTime;
     }
     
 }
