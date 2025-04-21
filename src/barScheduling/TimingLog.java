@@ -94,7 +94,7 @@ public class TimingLog {
             double cpuUtil = (simDuration > 0) ? (totalDrinkPrepTime * 100.0) / simDuration : 0;
             double throughput = (simDuration > 0) ? (totalNumberOfdrinks * 1000.0) / simDuration : 0;
 
-            summaryWriter.printf("%s,%s,%s,%s,%.2f%n",
+            summaryWriter.printf("%s,%s,%s,%s,%.2f,%.2f%n",
             currentRunInfo,
             formatStats(turnaroundList),
             formatStats(waitingList),

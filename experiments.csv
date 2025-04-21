@@ -24,3 +24,29 @@ PatronID,ResponseTime,TotalWaitingTime,TurnaroundTime
 9,784,2507,3213
 3,1410,3173,3601
 5,416,3108,3608
+
+# Run: Patrons=10, Scheduler=RR, Quantum=30, Switch=5, Seed=42
+PatronID,ResponseTime,TotalWaitingTime,TurnaroundTime
+1,26,1635,2081
+0,27,1551,2360
+2,26,1828,2511
+6,212,2233,2925
+4,108,2444,3092
+7,228,2430,3038
+8,454,2509,3167
+9,782,2492,3197
+3,1410,3159,3586
+5,414,3093,3592
+
+# Run: Patrons=10, Scheduler=RR, Quantum=30, Switch=5, Seed=42
+PatronID,ResponseTime,TotalWaitingTime,TurnaroundTime
+1,25,1659,2105
+0,26,1578,2388
+2,26,1861,2545
+6,212,2279,2975
+4,108,2494,3142
+7,228,2480,3089
+8,457,2562,3223
+9,792,2544,3254
+3,1426,3215,3645
+5,416,3151,3654
