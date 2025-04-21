@@ -19,9 +19,13 @@ public class Patron extends Thread {
 	//Timing values
 	private long firstOrderPlacedTime;
 	private long lastDrinkFinishTime;
-
+	private long waitingTime = 0;
+	private long turnaroundTime = 0;
+	private long orderPlacedTime = 0;
+	private long orderReceivedTime = 0;
 
 	private DrinkOrder [] drinksOrder;
+	
 	
 	Patron( int ID,  CountDownLatch startSignal, Barman aBarman, long seed) {
 		this.ID=ID;
@@ -54,7 +58,11 @@ public class Patron extends Thread {
         			firstOrderPlacedTime = System.currentTimeMillis(); 
                 }
 
-	        	drinksOrder[i]=new DrinkOrder(this.ID); //order a drink (=CPU burst)	        
+				//Record time of order placed
+				orderPlacedTime = System.currentTimeMillis(); 
+
+				//Modify constructor line to include time of order placed for each drink
+	        	drinksOrder[i]=new DrinkOrder(this.ID, orderPlacedTime); //order a drink (=CPU burst)	        
 	        	//drinksOrder[i]=new DrinkOrder(this.ID,i); //fixed drink order (=CPU burst), useful for testing
 				System.out.println("Order placed by " + drinksOrder[i].toString()); //output in standard format  - do not change this
 				theBarman.placeDrinkOrder(drinksOrder[i]);
@@ -71,8 +79,15 @@ public class Patron extends Thread {
 			System.out.println("Patron "+ this.ID + " completed ");
 
 			// Turnaround = last drink finish - first order placed
-			long turnaround = lastDrinkFinishTime - firstOrderPlacedTime;
+			turnaroundTime = lastDrinkFinishTime - firstOrderPlacedTime;
 
+			//Waiting time = Time between order placed until order started for all 5 drinks
+			for (int i = 0; i < numberOfDrinks; i++) {
+				waitingTime += drinksOrder[i].getOrderStartTime() - drinksOrder[i].getOrderPlacedTime();
+			}
+
+
+			
 			
 		} catch (InterruptedException e1) {  //do nothing
 		}

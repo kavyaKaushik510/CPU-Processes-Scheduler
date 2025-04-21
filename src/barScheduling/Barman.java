@@ -67,6 +67,8 @@ public class Barman extends Thread {
 					System.out.println("---Barman waiting for next order ");
 					currentOrder=orderQueue.take();
 
+					currentOrder.startPreparation(); //Order preparation started - used to record order start time
+
 					System.out.println("---Barman preparing drink for patron "+ currentOrder.toString() );
 					burst=currentOrder.getExecutionTime();
 					if(burst<=q) { //within the quantum
