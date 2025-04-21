@@ -16,6 +16,10 @@ public class Patron extends Thread {
 	private int ID; //thread ID 
 	private int numberOfDrinks;
 
+	//Timing values
+	private long firstOrderPlacedTime;
+	private long lastDrinkFinishTime;
+
 
 	private DrinkOrder [] drinksOrder;
 	
@@ -42,7 +46,14 @@ public class Patron extends Thread {
 			System.out.println("+new thirsty Patron "+ this.ID +" arrived"); //Patron has actually arrived
 			//End do not change
 			
+
 	        for(int i=0;i<numberOfDrinks;i++) {
+
+				//Record time of first drink ordered
+				if (i == 0) {
+        			firstOrderPlacedTime = System.currentTimeMillis(); 
+                }
+
 	        	drinksOrder[i]=new DrinkOrder(this.ID); //order a drink (=CPU burst)	        
 	        	//drinksOrder[i]=new DrinkOrder(this.ID,i); //fixed drink order (=CPU burst), useful for testing
 				System.out.println("Order placed by " + drinksOrder[i].toString()); //output in standard format  - do not change this
@@ -50,9 +61,18 @@ public class Patron extends Thread {
 				drinksOrder[i].waitForOrder();
 				System.out.println("Drinking patron " + drinksOrder[i].toString());
 				sleep(drinksOrder[i].getImbibingTime()); //drinking drink = "IO"
+
+				//Record time when last drink is finished by Patron
+				 if (i == numberOfDrinks - 1) {
+        			lastDrinkFinishTime = System.currentTimeMillis(); 
+    			}
 			}
 
 			System.out.println("Patron "+ this.ID + " completed ");
+
+			// Turnaround = last drink finish - first order placed
+			long turnaround = lastDrinkFinishTime - firstOrderPlacedTime;
+
 			
 		} catch (InterruptedException e1) {  //do nothing
 		}
