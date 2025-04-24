@@ -20,6 +20,9 @@ public class Barman extends Thread {
 	int schedAlg =0;
 	int q=10000; //really big if not set, so FCFS
 	private int switchTime;
+
+	private long preparationStart;
+	private long preparationEnd;
 	
 	
 	Barman(  CountDownLatch startSignal,int sAlg) {
@@ -50,11 +53,20 @@ public class Barman extends Thread {
 
 			if ((schedAlg==0)||(schedAlg==1)) { //FCFS and non-preemptive SJF
 				while(true) {
+					//Time preparation start
+					preparationStart=System.currentTimeMillis();
+
 					currentOrder=orderQueue.take();
 					System.out.println("---Barman preparing drink for patron "+ currentOrder.toString());
 					sleep(currentOrder.getExecutionTime()); //processing order (="CPU burst")
 					System.out.println("---Barman has made drink for patron "+ currentOrder.toString());
 					currentOrder.orderDone();
+
+					//Time preparation end
+					preparationEnd=System.currentTimeMillis();
+					//Log the preparation time
+					TimingLog.logDrinkPreparationTime(preparationStart - preparationStart);
+
 					sleep(switchTime);//cost for switching orders
 				}
 			}
@@ -65,20 +77,23 @@ public class Barman extends Thread {
 
 				while(true) {
 					System.out.println("---Barman waiting for next order ");
+
+					//Time preparation start
+					preparationStart=System.currentTimeMillis();
+
 					currentOrder=orderQueue.take();
-
-					currentOrder.startPreparation(); //Order preparation started - used to record order start time
-
 					System.out.println("---Barman preparing drink for patron "+ currentOrder.toString() );
 					burst=currentOrder.getExecutionTime();
 					if(burst<=q) { //within the quantum
 						sleep(burst); //processing complete order ="CPU burst"
 						System.out.println("---Barman has made drink for patron "+ currentOrder.toString());
-						currentOrder.orderDone();		
+						currentOrder.orderDone();			
 						
-						//Log order preparation Time
-						long prepDuration = currentOrder.getOrderCompletedTime() - currentOrder.getOrderStartTime();
-						TimingLog.logDrinkPreparationTime(prepDuration);
+					//Time preparation end
+					preparationEnd=System.currentTimeMillis();
+					//Log the preparation time
+					TimingLog.logDrinkPreparationTime(preparationStart - preparationStart);
+					
 					}
 					else {
 						sleep(q);

@@ -32,7 +32,6 @@ public class DrinkOrder  {
         private final String name;
         private int preparationTime; // time to prepare the drink (in minutes)
         private final int imbibingTime; // time to drink the drink (in minutes)
-        
 
         Drink(String name, int preparationTime, int drinkingTime) {
             this.name = name;
@@ -65,23 +64,17 @@ public class DrinkOrder  {
     private int orderer;
     private AtomicBoolean orderComplete;
 
-    //Timings to be recorded 
-    private long orderPlacedTime = 0;
-    private long orderStartTime = 0;
-    private long orderCompletedTime = 0;
-
  //constructor
-    public DrinkOrder(int patron, long orderPlacedTime) {
-    	this(patron,random.nextInt(Drink.values().length), orderPlacedTime);    	
+    public DrinkOrder(int patron) {
+    	this(patron,random.nextInt(Drink.values().length));    	
     }
     
-    public DrinkOrder(int patron, int i, long orderPlaced) {
+    public DrinkOrder(int patron, int i) {
         Drink[] drinks = Drink.values();  // Get all enum constants
         drink=drinks[i];
     	orderComplete = new AtomicBoolean(false);
     	orderer=patron;
         prepTime=drink.getPreparationTime();
-        orderPlacedTime = orderPlaced;
     }
     
     public static Drink getRandomDrink() {
@@ -98,11 +91,6 @@ public class DrinkOrder  {
     public int getImbibingTime() {
         return drink.getImbibingTime();
     }
-
-    // Add method to indicate the time when barman starts making the drink
-    public void startPreparation() {
-        orderStartTime= System.currentTimeMillis();
-    }
     
     //when interrupted making it
     public void setRemainingPreparationTime(int timeLeft) {
@@ -111,8 +99,7 @@ public class DrinkOrder  {
 
     //Barman signals when order is done
     public synchronized void orderDone() {
-        orderCompletedTime = System.currentTimeMillis();
-        orderComplete.set(true);
+    	orderComplete.set(true);
         this.notifyAll();
     }
     
@@ -127,17 +114,4 @@ public class DrinkOrder  {
     public String toString() {
         return Integer.toString(orderer) +": "+ drink.getName();
     }
-
-    public long getOrderPlacedTime() {
-        return orderPlacedTime;
-    }
-
-    public long getOrderStartTime() {
-        return orderStartTime;
-    }
-
-    public long getOrderCompletedTime() {
-        return orderCompletedTime;
-    }
-    
 }

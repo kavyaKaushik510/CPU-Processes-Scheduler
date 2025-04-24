@@ -2,6 +2,8 @@
 package barScheduling;
 
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 
@@ -22,8 +24,11 @@ public class Patron extends Thread {
 	private long waitingTime = 0;
 	private long turnaroundTime = 0;
 	private long responseTime = 0;
-	private long orderPlacedTime = 0;
-	private long orderReceivedTime = 0;
+	long[] orderPlaceTime = new long[5];
+	long[] orderReceiveTime = new long[5];
+	long[] orderDrinkFinishTime = new long[5];
+	long[] waitingTimes = new long[5];
+
 
 	private DrinkOrder [] drinksOrder;
 	
@@ -54,42 +59,45 @@ public class Patron extends Thread {
 
 	        for(int i=0;i<numberOfDrinks;i++) {
 
-				//Record time of first drink ordered
-				if (i == 0) {
-        			firstOrderPlacedTime = System.currentTimeMillis(); 
-                }
-
-				//Record time of order placed
-				orderPlacedTime = System.currentTimeMillis(); 
-
-				//Modify constructor line to include time of order placed for each drink
-	        	drinksOrder[i]=new DrinkOrder(this.ID, orderPlacedTime); //order a drink (=CPU burst)	        
+	        	drinksOrder[i]=new DrinkOrder(this.ID); //order a drink (=CPU burst)	        
 	        	//drinksOrder[i]=new DrinkOrder(this.ID,i); //fixed drink order (=CPU burst), useful for testing
 				System.out.println("Order placed by " + drinksOrder[i].toString()); //output in standard format  - do not change this
+				
+				//Record time of order placed
+				orderPlaceTime[i] = System.currentTimeMillis(); 
+
 				theBarman.placeDrinkOrder(drinksOrder[i]);
 				drinksOrder[i].waitForOrder();
+
+				//Record time when order is received
+				orderReceiveTime[i] = System.currentTimeMillis();
+				//waitingTimes[i] = orderReceiveTime[i] - (drinksOrder[i].getPreparationTime()) - orderPlaceTime[i];
+
 				System.out.println("Drinking patron " + drinksOrder[i].toString());
 				sleep(drinksOrder[i].getImbibingTime()); //drinking drink = "IO"
-
-				//Record time when last drink is finished by Patron
-				 if (i == numberOfDrinks - 1) {
-        			lastDrinkFinishTime = System.currentTimeMillis(); 
-    			}
+				orderDrinkFinishTime[i] = System.currentTimeMillis();
+				
+				//code waiting time
 			}
 
+			// Record finish time for throughput window tracking
+			TimingLog.logPatronFinishTime(System.currentTimeMillis());
+
 			System.out.println("Patron "+ this.ID + " completed ");
+
+			
 
 			// Turnaround = last drink finish - first order placed
 			turnaroundTime = lastDrinkFinishTime - firstOrderPlacedTime;
 
-			//Waiting time = Time between order placed until order started for all 5 drinks
-			for (int i = 0; i < numberOfDrinks; i++) {
-				waitingTime += drinksOrder[i].getOrderStartTime() - drinksOrder[i].getOrderPlacedTime();
-			}
+			//WRONG SHOULD BE Oorder start time
+			//for (int i=0; i<numberOfDrinks; i++) {
+			//	waitingTime += orderReceiveTime[i] - orderPlaceTime[i]; //waiting time for each drink
+			//}
 
 			//Response Time = Time between placing order for first drink and receiving it
-			long firstOrderCompletedTime = drinksOrder[0].getOrderCompletedTime();
-			responseTime = firstOrderCompletedTime - firstOrderPlacedTime;
+			responseTime = orderReceiveTime[0] - orderPlaceTime[0];
+
 
 			TimingLog.logPatronMetrics(this.ID, responseTime, waitingTime, turnaroundTime);
 			

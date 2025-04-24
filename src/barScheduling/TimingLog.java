@@ -27,6 +27,10 @@ public class TimingLog {
     private static List<Long> waitingList = new ArrayList<>();
     private static List<Long> responseList = new ArrayList<>();
 
+    private static final List<Long> patronFinishTimes = new ArrayList<>();
+    private static final int WINDOW_SIZE = 500; // in ms
+
+
 
     public static void init(int patrons, int schedAlg, int q, int switchTime, long seed) throws IOException {
         metricsWriter = new PrintWriter(new FileWriter(metricsFile, true)); 
@@ -46,7 +50,6 @@ public class TimingLog {
                 scheduler = "Unknown";
                 break;
         }
-
 
 
         String qDisplay = (schedAlg == 2) ? String.valueOf(q) : "N/A";
@@ -80,6 +83,38 @@ public class TimingLog {
         return (int) totalDrinkPrepTime;
     }
 
+    public static synchronized void logPatronFinishTime(long timestamp) {
+        patronFinishTimes.add(timestamp);
+    }
+
+    //Write the throughput of patrons by time window
+    private static void writeThroughputByWindow() throws IOException {
+        try (PrintWriter writer = new PrintWriter(new FileWriter("throughput_windows.csv", true))) {
+            writer.printf("# %s%n", currentRunInfo);
+            if (patronFinishTimes.isEmpty()) return;
+    
+            Collections.sort(patronFinishTimes);
+            long simStart = patronFinishTimes.get(0);
+            long simEnd = patronFinishTimes.get(patronFinishTimes.size() - 1);
+            long windowStart = simStart;
+    
+            int index = 0;
+            while (windowStart <= simEnd) {
+                long windowEnd = windowStart + WINDOW_SIZE;
+                int count = 0;
+    
+                while (index < patronFinishTimes.size() && patronFinishTimes.get(index) < windowEnd) {
+                    count++;
+                    index++;
+                }
+    
+                writer.printf("%d,%d\n", windowStart - simStart, count); // time since start, patrons completed
+                windowStart = windowEnd;
+            }
+        }
+    }
+    
+
     public static void writeSummaryStats() throws IOException {
         try (PrintWriter summaryWriter = new PrintWriter(new FileWriter(summaryFile, true))) {
             File file = new File(summaryFile);
@@ -88,18 +123,17 @@ public class TimingLog {
                         "AvgTAT,MedTAT,StdTAT," +
                         "AvgWait,MedWait,StdWait," +
                         "AvgResp,MedResp,StdResp," +
-                        "CPUUtilization,Throughput");
+                        "CPUUtilization");
             }
 
             double cpuUtil = (simDuration > 0) ? (totalDrinkPrepTime * 100.0) / simDuration : 0;
-            double throughput = (simDuration > 0) ? (totalNumberOfdrinks * 1000.0) / simDuration : 0;
-
-            summaryWriter.printf("%s,%s,%s,%s,%.2f,%.2f%n",
+            
+            summaryWriter.printf("%s,%s,%s,%.2f,%.2f%n",
             currentRunInfo,
             formatStats(turnaroundList),
             formatStats(waitingList),
             formatStats(responseList),
-            cpuUtil, throughput);
+            cpuUtil);
         }
     
     }
@@ -119,10 +153,12 @@ public class TimingLog {
         return (sorted.size() % 2 == 0) ? (sorted.get(mid - 1) + sorted.get(mid)) / 2 : sorted.get(mid);
     }
 
+
     public static void close() {
         if (metricsWriter != null) metricsWriter.close();
         try {
             writeSummaryStats();
+            writeThroughputByWindow();
         } catch (IOException e) {
             System.err.println("Failed to write summary stats: " + e.getMessage());
         }
@@ -131,4 +167,6 @@ public class TimingLog {
         turnaroundList.clear();
         totalDrinkPrepTime = 0;
     }
+
+    
 }
