@@ -71,7 +71,8 @@ public class Patron extends Thread {
 
 				//Record time when order is received
 				orderReceiveTime[i] = System.currentTimeMillis();
-				//waitingTimes[i] = orderReceiveTime[i] - (drinksOrder[i].getPreparationTime()) - orderPlaceTime[i];
+			    waitingTimes[i] = orderReceiveTime[i] - (drinksOrder[i].getExecutionTime()) - orderPlaceTime[i];
+
 
 				System.out.println("Drinking patron " + drinksOrder[i].toString());
 				sleep(drinksOrder[i].getImbibingTime()); //drinking drink = "IO"
@@ -88,12 +89,12 @@ public class Patron extends Thread {
 			
 
 			// Turnaround = last drink finish - first order placed
-			turnaroundTime = lastDrinkFinishTime - firstOrderPlacedTime;
+			turnaroundTime = orderDrinkFinishTime[numberOfDrinks-1] - orderPlaceTime[0];
 
-			//WRONG SHOULD BE Oorder start time
-			//for (int i=0; i<numberOfDrinks; i++) {
-			//	waitingTime += orderReceiveTime[i] - orderPlaceTime[i]; //waiting time for each drink
-			//}
+
+			for (int i=0; i<numberOfDrinks; i++) {
+				waitingTime += waitingTimes[i]; //total waiting time for all drinks
+			}
 
 			//Response Time = Time between placing order for first drink and receiving it
 			responseTime = orderReceiveTime[0] - orderPlaceTime[0];

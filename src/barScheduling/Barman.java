@@ -65,7 +65,7 @@ public class Barman extends Thread {
 					//Time preparation end
 					preparationEnd=System.currentTimeMillis();
 					//Log the preparation time
-					TimingLog.logDrinkPreparationTime(preparationStart - preparationStart);
+					TimingLog.logDrinkPreparationTime(preparationEnd - preparationStart);
 
 					sleep(switchTime);//cost for switching orders
 				}
@@ -92,7 +92,7 @@ public class Barman extends Thread {
 					//Time preparation end
 					preparationEnd=System.currentTimeMillis();
 					//Log the preparation time
-					TimingLog.logDrinkPreparationTime(preparationStart - preparationStart);
+					TimingLog.logDrinkPreparationTime(preparationEnd - preparationStart);
 					
 					}
 					else {
