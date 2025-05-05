@@ -1,3 +1,6 @@
+//KSHKAV001
+//Class to log the metrics of the simulation
+
 package barScheduling;
 
 import java.io.File;
@@ -10,6 +13,7 @@ import java.util.List;
 
 public class TimingLog {
 
+    //File to log the metrics
     private static PrintWriter metricsWriter;
     private static String metricsFile= "experiments.csv";
     private static String summaryFile = "experiment_summary.csv";
@@ -28,10 +32,10 @@ public class TimingLog {
     private static List<Long> responseList = new ArrayList<>();
 
     private static final List<Long> patronFinishTimes = new ArrayList<>();
-    private static final int WINDOW_SIZE = 2000; // in ms
+    private static final int WINDOW_SIZE = 2000; // time window size in milliseconds for throughput calculation
 
 
-
+    // Initialize the log file and write the header
     public static void init(int patrons, int schedAlg, int q, int switchTime, long seed) throws IOException {
         metricsWriter = new PrintWriter(new FileWriter(metricsFile, true)); 
 
@@ -62,6 +66,7 @@ public class TimingLog {
         metricsWriter.flush();
     }
 
+    // Log the metrics for each patron
     public static synchronized void logPatronMetrics(int patronId, long responseTime, long totalWaitingTime, long turnaroundTime) {
         metricsWriter.printf("%d,%d,%d,%d%n", patronId, responseTime, totalWaitingTime, turnaroundTime);
         metricsWriter.flush();
@@ -71,18 +76,22 @@ public class TimingLog {
         turnaroundList.add(turnaroundTime);
     }
 
+    // Log the total simulation time
     public static void recordSimulationDuration(long simulationDuration) {
         simDuration = simulationDuration;
     }
 
+    //Log total time CPU is busy preparing drinks
     public static void logDrinkPreparationTime(long prepDuration){
         totalDrinkPrepTime += prepDuration;
     }
 
+    //Get the total time CPU is busy preparing drinks
     public static int getTotalDrinkPrepTime() {
         return (int) totalDrinkPrepTime; 
     }
 
+    //Log the time at which the patrons finish
     public static synchronized void logPatronFinishTime(long timestamp) {
         patronFinishTimes.add(timestamp);
     }
@@ -93,6 +102,7 @@ public class TimingLog {
             writer.printf("# %s%n", currentRunInfo);
             if (patronFinishTimes.isEmpty()) return;
     
+            //Order the patrons based on their finish time
             Collections.sort(patronFinishTimes);
             long simStart = patronFinishTimes.get(0);
             long simEnd = patronFinishTimes.get(patronFinishTimes.size() - 1);
@@ -114,7 +124,7 @@ public class TimingLog {
         }
     }
     
-
+    //Write summary statitics of each run to the summary file
     public static void writeSummaryStats() throws IOException {
         try (PrintWriter summaryWriter = new PrintWriter(new FileWriter(summaryFile, true))) {
             File file = new File(summaryFile);
@@ -126,6 +136,7 @@ public class TimingLog {
                         "CPUUtilization");
             }
 
+            //Calculate CPU Utilization percentage
             double cpuUtil = (simDuration > 0) ? (totalDrinkPrepTime * 100.0) / simDuration : 0;
             
             summaryWriter.printf("%s,%s,%s,%s,%.2f%n",
@@ -138,6 +149,7 @@ public class TimingLog {
     
     }
 
+    //Calculate the average, median and standard deviation of the patron metrics
     private static String formatStats(List<Long> list) {
         if (list.isEmpty()) return "0,0,0";
         double avg = list.stream().mapToLong(Long::longValue).average().orElse(0);
@@ -153,7 +165,7 @@ public class TimingLog {
         return (sorted.size() % 2 == 0) ? (sorted.get(mid - 1) + sorted.get(mid)) / 2 : sorted.get(mid);
     }
 
-
+    //Close the files and clear the lists
     public static void close() {
         if (metricsWriter != null) metricsWriter.close();
         try {
