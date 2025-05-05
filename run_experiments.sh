@@ -8,6 +8,7 @@ SWITCHTIME=3
 QUANTUM=75
 
 # List of seeds
+#SEEDS=(101 102)
 SEEDS=(101 102 103 104 105 106 107 108 109 110)
 
 # For each seed, run FCFS (0), SJF (1), and RR (2)
